@@ -122,6 +122,44 @@ def haversine_m(a_lat, a_lng, b_lat, b_lng):
     return 2 * R * math.asin(math.sqrt(h))
 
 
+def _edge_coords(G, u, v, data):
+    """Return [[lat,lng], ...] for an edge — real geometry if present, else straight."""
+    geom = data.get("geometry")
+    if geom is not None:
+        try:
+            return [[round(y, 6), round(x, 6)] for x, y in geom.coords]
+        except Exception:  # noqa: BLE001
+            pass
+    ud, vd = G.nodes[u], G.nodes[v]
+    return [[round(ud["y"], 6), round(ud["x"], 6)], [round(vd["y"], 6), round(vd["x"], 6)]]
+
+
+def segments_near(lat: float, lng: float, radius_m: float = 350, limit: int = 80):
+    """Real road segments whose midpoint falls within radius of (lat,lng).
+
+    Returns list of {polyline, dist_m} sorted nearest-first. Empty if no graph.
+    Used to paint congested roads (Google-traffic style) instead of a flat circle.
+    """
+    G = get_graph()
+    if G is None:
+        return []
+    out = []
+    seen = set()
+    for u, v, data in G.edges(data=True):
+        key = (min(u, v), max(u, v))
+        if key in seen:
+            continue
+        ud, vd = G.nodes[u], G.nodes[v]
+        mlat = (ud["y"] + vd["y"]) / 2
+        mlng = (ud["x"] + vd["x"]) / 2
+        d = haversine_m(lat, lng, mlat, mlng)
+        if d <= radius_m:
+            seen.add(key)
+            out.append({"polyline": _edge_coords(G, u, v, data), "dist_m": d})
+    out.sort(key=lambda s: s["dist_m"])
+    return out[:limit]
+
+
 if __name__ == "__main__":
     if "--build" in sys.argv:
         build_graph()

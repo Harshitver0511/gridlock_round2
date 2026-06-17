@@ -9,6 +9,31 @@ import pandas as pd
 
 from config import MODELS_DIR, ZONE_STATS, color_for, radius_for
 from diversion import compute_diversion
+from road_network import segments_near
+
+
+def congestion_segments(lat, lng, risk, radius_m=350):
+    """Color real road geometry near a point by congestion severity (Google-traffic style).
+
+    Closest roads = deep red, fading to orange/amber outward. Returns list of
+    {polyline, color, weight}. Empty list if the road graph isn't built (frontend
+    then falls back to the risk circle)."""
+    segs = segments_near(lat, lng, radius_m=radius_m)
+    out = []
+    for s in segs:
+        frac = min(1.0, s["dist_m"] / radius_m)        # 0 = at incident, 1 = edge
+        sev = risk * (1 - 0.55 * frac)                  # nearer roads look worse
+        if sev >= 70:
+            color = "#e0301e"        # deep red
+        elif sev >= 50:
+            color = "#fc6a3f"        # red-orange
+        elif sev >= 32:
+            color = "#fda53f"        # orange
+        else:
+            color = "#f4c542"        # amber
+        out.append({"polyline": s["polyline"], "color": color,
+                    "weight": 6 if frac < 0.4 else 4})
+    return out
 
 FEATURES = ["event_cause", "corridor", "hour", "dow", "is_weekend", "month"]
 
@@ -114,6 +139,9 @@ def enrich_incident(row: dict) -> dict:
             blocked_label=f"{corridor} @ {row.get('address','incident')[:40]}",
         )
 
+    # real congested road geometry around the incident (Google-traffic style)
+    congestion = congestion_segments(lat, lng, risk)
+
     return {
         "id": row.get("id", "NA"),
         "cause": cause,
@@ -127,6 +155,7 @@ def enrich_incident(row: dict) -> dict:
         "risk_score": risk,
         "color": color_for(risk),
         "radius_m": radius_for(risk),
+        "congestion_segments": congestion,
         "affected_junctions": spread,
         "recommendation": {
             "officers": officers,

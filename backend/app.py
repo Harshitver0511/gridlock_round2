@@ -11,7 +11,8 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from config import LEGEND, ZONE_STATS, color_for, radius_for
 from feed_sim import first_time, incidents_between
-from predictor import enrich_incident, baseline_risk
+from predictor import enrich_incident, baseline_risk, congestion_segments
+from diversion import compute_diversion
 
 app = FastAPI(title="Gridlock — Event-Driven Congestion API")
 app.add_middleware(
@@ -153,6 +154,24 @@ def forecast(req: dict):
 
     priority = "High" if peak >= 60 else "Low"
     closure = round(min(0.95, 0.4 + crowd / 60000), 2)
+
+    # congested roads around the venue (Google-traffic style)
+    congestion = congestion_segments(lat, lng, peak, radius_m=500)
+
+    # per-zone deployment + a real diversion around the venue core
+    recommendations = []
+    for zid, nm, la, ln, sens in zone_defs:
+        zr = pm[zid]["risk_score"]
+        is_core = zid == "z1"
+        recommendations.append({
+            "zone_id": zid, "name": nm,
+            "officers": max(2, int(round(zr / 12)) + (2 if is_core else 0)),
+            "barricades": [{"lat": round(la, 5), "lng": round(ln, 5)}],
+            "diversion": compute_diversion(
+                lat, lng, peak, closure, blocked_label=f"{cause} venue @ {nm}",
+            ) if is_core else None,
+        })
+
     return {
         "endpoint": "/api/forecast",
         "request_echo": req,
@@ -163,12 +182,8 @@ def forecast(req: dict):
             "headline": f"{cause} forecast: peak risk {peak} at {peak_w}.",
         },
         "impact_zones": impact,
+        "congestion_segments": congestion,
         "timeline": timeline,
-        "recommendations": [
-            {"zone_id": "z1", "name": "Venue core",
-             "officers": 8 if priority == "High" else 4,
-             "barricades": [{"lat": round(lat, 5), "lng": round(lng, 5)}],
-             "diversion": None},
-        ],
+        "recommendations": recommendations,
         "legend": LEGEND,
     }

@@ -1,0 +1,99 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #050506;
+  --accent: #5b8cff;
+}
+
+* {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+html,
+body {
+  background: var(--bg);
+  color: #ededf0;
+  scroll-behavior: smooth;
+}
+
+body {
+  /* soft ambient radial lighting — the single atmospheric layer */
+  background-image:
+    radial-gradient(60rem 60rem at 50% -20%, rgba(91, 140, 255, 0.10), transparent 60%),
+    radial-gradient(40rem 40rem at 90% 10%, rgba(91, 140, 255, 0.05), transparent 55%);
+  background-attachment: fixed;
+}
+
+@layer components {
+  .glass {
+    @apply bg-white/[0.03] backdrop-blur-xl border border-white/[0.07];
+  }
+  .glass-strong {
+    @apply bg-white/[0.05] backdrop-blur-2xl border border-white/[0.08];
+  }
+  .card {
+    @apply glass rounded-3xl shadow-glass;
+  }
+  .btn-accent {
+    @apply inline-flex items-center justify-center rounded-full bg-accent px-6 py-3
+           text-sm font-medium text-white transition-all duration-300
+           hover:bg-accent-soft hover:shadow-glow hover:-translate-y-0.5;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center rounded-full border border-white/10
+           bg-white/[0.02] px-6 py-3 text-sm font-medium text-white/80
+           transition-all duration-300 hover:bg-white/[0.06] hover:text-white;
+  }
+  .hairline {
+    @apply border-white/[0.06];
+  }
+}
+
+/* Custom thin scrollbar */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 8px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.16); }
+
+/* Leaflet dark tuning */
+.leaflet-container { background: #0a0a0c !important; font-family: inherit; }
+.leaflet-control-attribution {
+  background: rgba(0,0,0,0.4) !important;
+  color: rgba(255,255,255,0.3) !important;
+  backdrop-filter: blur(8px);
+}
+.leaflet-control-attribution a { color: rgba(255,255,255,0.45) !important; }
+.leaflet-bar a {
+  background: rgba(20,20,24,0.9) !important;
+  color: #fff !important;
+  border-color: rgba(255,255,255,0.08) !important;
+}
+
+/* range slider */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.12);
+  outline: none;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  box-shadow: 0 0 0 4px rgba(91,140,255,0.18), 0 0 20px rgba(91,140,255,0.5);
+  transition: transform 0.15s ease;
+}
+input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
+input[type="range"]::-moz-range-thumb {
+  width: 18px; height: 18px; border: none; border-radius: 50%;
+  background: var(--accent); cursor: pointer;
+  box-shadow: 0 0 0 4px rgba(91,140,255,0.18);
+}
