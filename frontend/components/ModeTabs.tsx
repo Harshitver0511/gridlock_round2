@@ -15,7 +15,7 @@ export default function ModeTabs({ mode, onChange }: { mode: Mode; onChange: (m:
         <button
           key={t.id}
           onClick={() => onChange(t.id)}
-          className={`relative rounded-full px-4 py-2 text-sm transition-all duration-300 ${
+          className={`relative whitespace-nowrap rounded-full px-3 py-1.5 text-xs transition-all duration-300 sm:px-4 sm:py-2 sm:text-sm ${
             mode === t.id ? "bg-accent text-white shadow-glow" : "text-white/55 hover:text-white"
           }`}
         >

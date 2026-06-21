@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 
@@ -8,6 +8,11 @@ export const metadata: Metadata = {
   title: "Gridlock — Event-Driven Congestion Intelligence",
   description:
     "Predict, prevent and react to traffic congestion in real time. Built for Flipkart GRID.",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

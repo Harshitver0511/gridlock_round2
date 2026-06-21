@@ -263,10 +263,10 @@ export default function Home() {
             </Link>
           </Reveal>
 
-          <div className="grid gap-px overflow-hidden rounded-3xl border border-white/[0.07] sm:grid-cols-2">
+          <div className="grid min-w-0 gap-px overflow-hidden rounded-3xl border border-white/[0.07] sm:grid-cols-2">
             {capabilities.map((c, i) => (
               <Reveal key={c.title} delay={i * 90}>
-                <div className="group h-full bg-ink-950/40 p-7 transition-colors duration-500 hover:bg-white/[0.03]">
+                <div className="group h-full min-w-0 bg-ink-950/40 p-7 transition-colors duration-500 hover:bg-white/[0.03]">
                   <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] text-accent-soft transition-colors group-hover:border-accent/25">
                     <Icon path={c.icon} />
                   </span>
@@ -282,9 +282,9 @@ export default function Home() {
       {/* =========================== HOW =========================== */}
       <section id="how" className="relative mx-auto max-w-6xl px-6 py-20">
         <Reveal>
-          <div className="card overflow-hidden p-10 sm:p-14">
+          <div className="card overflow-hidden p-6 sm:p-10 md:p-14">
             <div className="grid gap-12 md:grid-cols-2 md:items-center">
-              <div>
+              <div className="min-w-0">
                 <p className="lp-index mb-5">03 — The pipeline</p>
                 <h2 className="text-3xl font-semibold tracking-tight text-white sm:text-[2.4rem] sm:leading-[1.1]">
                   From a single incident to an action plan — in one call.
@@ -295,7 +295,7 @@ export default function Home() {
                   road-network diversions, and a fleet broadcast.
                 </p>
               </div>
-              <ol className="relative space-y-1 before:absolute before:left-[1.4rem] before:top-4 before:bottom-4 before:w-px before:bg-gradient-to-b before:from-accent/40 before:via-white/10 before:to-transparent">
+              <ol className="relative min-w-0 space-y-1 before:absolute before:left-[1.4rem] before:top-4 before:bottom-4 before:w-px before:bg-gradient-to-b before:from-accent/40 before:via-white/10 before:to-transparent">
                 {pipeline.map(([k, v], i) => (
                   <li
                     key={k}
@@ -319,9 +319,9 @@ export default function Home() {
       {/* ===================== FLEET QUARANTINE API ===================== */}
       <section id="fleet" className="relative mx-auto max-w-6xl px-6 py-20">
         <Reveal>
-          <div className="card overflow-hidden p-10 sm:p-14">
+          <div className="card overflow-hidden p-6 sm:p-10 md:p-14">
             <div className="grid gap-12 md:grid-cols-2 md:items-center">
-              <div>
+              <div className="min-w-0">
                 <p className="lp-index mb-5">04 — Fleet API</p>
                 <span className="inline-block rounded-full border border-[#ff9f0a]/30 bg-[#ff9f0a]/[0.08] px-3 py-1 text-xs font-medium text-[#ffce8a]">
                   B2B Broadcast API
@@ -359,7 +359,7 @@ export default function Home() {
               </div>
 
               {/* payload preview */}
-              <div className="rounded-2xl border border-white/[0.08] bg-ink-900/80 p-5 font-mono text-[11px] leading-relaxed shadow-soft">
+              <div className="min-w-0 rounded-2xl border border-white/[0.08] bg-ink-900/80 p-5 font-mono text-[11px] leading-relaxed shadow-soft">
                 <div className="mb-3 flex items-center gap-2 text-white/40">
                   <span className="h-2.5 w-2.5 rounded-full bg-[#ff9f0a]" />
                   GET broadcast · /api/fleet/quarantines
@@ -526,9 +526,9 @@ function ConsolePreview() {
         </span>
       </div>
 
-      <div className="grid grid-cols-[minmax(0,1fr)_1.6fr] text-left">
+      <div className="grid grid-cols-1 text-left sm:grid-cols-[minmax(0,1fr)_1.6fr]">
         {/* incident list */}
-        <div className="border-r border-white/[0.06] p-4">
+        <div className="border-b border-white/[0.06] p-4 sm:border-b-0 sm:border-r">
           <div className="mb-3 flex items-center justify-between">
             <span className="text-[11px] font-medium text-white/55">Incoming incidents</span>
             <span className="text-[10px] text-white/30">live feed</span>

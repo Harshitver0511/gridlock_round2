@@ -36,7 +36,13 @@
       "Bash(git checkout *)",
       "Bash(git add *)",
       "Bash(grep -rn *)",
-      "Bash(echo \"EXIT: $?\")"
+      "Bash(echo \"EXIT: $?\")",
+      "Bash(node -p \"require\\('./package.json'\\).dependencies.next\")",
+      "Bash(echo \"---EXIT $?---\")",
+      "Bash(npx playwright *)",
+      "Bash(node shot.mjs)",
+      "Bash(NODE_PATH=\"/c/Users/hverm/AppData/Local/npm-cache/_npx/e41f203b7505f1fb/node_modules\" node --experimental-loader)",
+      "Bash(sed -i 's#from \"playwright\"#from \"/c/Users/hverm/AppData/Local/npm-cache/_npx/e41f203b7505f1fb/node_modules/playwright/index.js\"#' shot.mjs)"
     ]
   }
 }

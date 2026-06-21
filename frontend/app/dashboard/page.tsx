@@ -192,30 +192,32 @@ export default function Dashboard() {
   }, [mode, risk, riskIdx, forecast, fcIdx, incidents, selected]);
 
   return (
-    <main className="flex h-screen flex-col overflow-hidden">
+    <main className="flex min-h-[100dvh] flex-col lg:h-screen lg:overflow-hidden">
       {/* top bar */}
-      <div className="flex items-center justify-between gap-4 px-5 py-3.5">
+      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-3 px-4 py-3 sm:px-5 sm:py-3.5">
         <Link href="/" className="flex items-center gap-2.5">
           <span className="h-2.5 w-2.5 rounded-full bg-accent" />
           <span className="text-sm font-semibold tracking-tight text-white">Gridlock</span>
           <span className="ml-1 hidden text-xs text-white/35 sm:inline">Operations Console</span>
         </Link>
-        <ModeTabs mode={mode} onChange={setMode} />
+        <div className="order-last flex w-full justify-center sm:order-none sm:w-auto">
+          <ModeTabs mode={mode} onChange={setMode} />
+        </div>
         <div className="hidden md:block">
           <Legend items={legend} />
         </div>
       </div>
 
       {error && (
-        <div className="mx-5 mb-2 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-2 text-xs text-red-200">
+        <div className="mx-4 mb-2 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-2 text-xs text-red-200 sm:mx-5">
           Backend unreachable — start FastAPI: <code className="text-red-100">uvicorn app:app --port 8000</code>
         </div>
       )}
 
       {/* body */}
-      <div className="grid flex-1 grid-cols-1 gap-4 overflow-hidden px-5 pb-5 lg:grid-cols-[1fr_380px]">
+      <div className="flex flex-1 flex-col gap-4 px-4 pb-4 sm:px-5 sm:pb-5 lg:grid lg:grid-cols-[1fr_380px] lg:overflow-hidden">
         {/* MAP */}
-        <div className="relative overflow-hidden rounded-3xl border border-white/[0.07]">
+        <div className="relative h-[55vh] min-h-[340px] overflow-hidden rounded-3xl border border-white/[0.07] lg:h-auto lg:min-h-0">
           <MapView
             center={map.center}
             zoom={map.zoom}
@@ -268,7 +270,7 @@ export default function Dashboard() {
         </div>
 
         {/* SIDE PANEL */}
-        <aside className="flex flex-col gap-4 overflow-hidden">
+        <aside className="flex min-h-0 flex-col gap-4 lg:overflow-hidden">
           {mode === "live" && (
             <LivePanel
               summary={liveSummary}
@@ -332,21 +334,21 @@ function LivePanel({
       )}
 
       {selected ? (
-        <div className="card flex-1 overflow-y-auto p-5">
+        <div className="card max-h-[75vh] flex-1 overflow-y-auto p-5 lg:max-h-none">
           <button onClick={() => onSelect(null)} className="mb-4 text-xs text-white/45 hover:text-white">
             ‹ Back to feed
           </button>
           <IncidentDetail incident={selected} activeRoute={activeRoute} onRouteSelect={onRouteSelect} />
         </div>
       ) : (
-        <div className="card flex-1 overflow-hidden">
-          <div className="flex items-center justify-between border-b border-white/[0.06] px-5 py-3">
+        <div className="card flex max-h-[70vh] min-h-[18rem] flex-1 flex-col overflow-hidden lg:max-h-none lg:min-h-0">
+          <div className="flex shrink-0 items-center justify-between border-b border-white/[0.06] px-5 py-3">
             <span className="text-sm font-medium text-white">Live incidents</span>
             <span className="flex items-center gap-1.5 text-xs text-white/40">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-accent" /> streaming
             </span>
           </div>
-          <div className="h-full space-y-2 overflow-y-auto p-3 pb-16">
+          <div className="min-h-0 flex-1 space-y-2 overflow-y-auto p-3 pb-16">
             {incidents.length === 0 && <div className="px-3 py-10 text-center text-sm text-white/35">Press play to start the stream.</div>}
             {incidents.map((inc) => (
               <IncidentCard key={inc.id} incident={inc} simTime={simTime} active={false} onClick={() => onSelect(inc)} />
@@ -370,8 +372,8 @@ function RiskPanel({ risk, idx }: { risk: RiskMapResponse | null; idx: number })
         <StatCard label="Overall risk" value={step.overall_risk} accent />
         <StatCard label="Top corridor" value={risk.summary.highest_zone?.name.split(" ")[0] ?? "—"} hint={`risk ${risk.summary.highest_zone?.risk_score ?? ""}`} />
       </div>
-      <div className="card flex-1 overflow-hidden">
-        <div className="h-full overflow-y-auto">
+      <div className="card flex max-h-[75vh] flex-1 flex-col overflow-hidden lg:max-h-none">
+        <div className="min-h-0 flex-1 overflow-y-auto">
           <div className="border-b border-white/[0.06] px-5 py-3 text-sm font-medium text-white">
             Pre-position priority
             <p className="mt-0.5 text-xs font-normal text-white/40">Corridors ranked by risk at this hour</p>

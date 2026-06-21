@@ -298,8 +298,8 @@ export default function FleetApiDocs() {
 
           {/* issued keys table */}
           {keys.length > 0 && (
-            <div className="mt-5 overflow-hidden rounded-2xl border border-white/[0.07]">
-              <table className="w-full text-left text-sm">
+            <div className="mt-5 overflow-x-auto rounded-2xl border border-white/[0.07]">
+              <table className="w-full min-w-[34rem] text-left text-sm">
                 <thead className="bg-white/[0.03] text-xs uppercase tracking-wide text-white/40">
                   <tr>
                     <th className="px-5 py-3 font-medium">Label</th>
@@ -354,8 +354,8 @@ export default function FleetApiDocs() {
             <span className="rounded-md bg-[#34c759]/15 px-2.5 py-1 text-xs font-semibold text-[#7ee29a]">GET</span>
             <code className="font-mono text-sm text-white/85">/api/fleet/quarantines</code>
           </div>
-          <div className="mt-4 overflow-hidden rounded-2xl border border-white/[0.07]">
-            <table className="w-full text-left text-sm">
+          <div className="mt-4 overflow-x-auto rounded-2xl border border-white/[0.07]">
+            <table className="w-full min-w-[34rem] text-left text-sm">
               <thead className="bg-white/[0.03] text-xs uppercase tracking-wide text-white/40">
                 <tr>
                   <th className="px-5 py-3 font-medium">Query param</th>
@@ -388,18 +388,18 @@ export default function FleetApiDocs() {
         <section className="mt-14">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h2 className="text-xl font-semibold tracking-tight text-white">Try it</h2>
-            <div className="flex items-center gap-2">
+            <div className="flex w-full items-center gap-2 sm:w-auto">
               <input
                 value={tryKey}
                 onChange={(e) => setTryKey(e.target.value)}
                 spellCheck={false}
                 placeholder="X-API-Key"
-                className="w-56 rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 font-mono text-[12px] text-white/80 outline-none transition focus:border-accent/50"
+                className="w-full min-w-0 rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 font-mono text-[12px] text-white/80 outline-none transition focus:border-accent/50 sm:w-56"
               />
               <button
                 onClick={tryIt}
                 disabled={loading}
-                className="btn-accent !px-5 !py-2 text-[13px] disabled:opacity-50"
+                className="btn-accent shrink-0 !px-5 !py-2 text-[13px] disabled:opacity-50"
               >
                 {loading ? "Calling…" : "Send request"}
               </button>
@@ -440,8 +440,8 @@ export default function FleetApiDocs() {
         <section className="mt-14">
           <h2 className="text-xl font-semibold tracking-tight text-white">Zone payload</h2>
           <p className="mt-2 text-sm text-white/50">Each item in <code className="font-mono text-white/70">zones[]</code> is a quarantine zone:</p>
-          <div className="mt-4 overflow-hidden rounded-2xl border border-white/[0.07]">
-            <table className="w-full text-left text-sm">
+          <div className="mt-4 overflow-x-auto rounded-2xl border border-white/[0.07]">
+            <table className="w-full min-w-[34rem] text-left text-sm">
               <thead className="bg-white/[0.03] text-xs uppercase tracking-wide text-white/40">
                 <tr>
                   <th className="px-5 py-3 font-medium">Field</th>
