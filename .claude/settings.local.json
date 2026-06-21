@@ -26,7 +26,8 @@
       "Bash(curl -s --max-time 3 localhost:8000/)",
       "Bash(./venv/bin/python -c ' *)",
       "Bash(curl -s --max-time 30 http://localhost:3000/)",
-      "Bash(curl -s --max-time 30 http://localhost:3000/fleet-api)"
+      "Bash(curl -s --max-time 30 http://localhost:3000/fleet-api)",
+      "Bash(grep -iE \"\\\\.\\(tsx|jsx\\)$\")"
     ]
   }
 }

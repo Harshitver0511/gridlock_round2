@@ -67,12 +67,14 @@ export default function Dashboard() {
   const [selected, setSelected] = useState<Incident | null>(null);
   const [activeRoute, setActiveRoute] = useState(0);
   const [liveSummary, setLiveSummary] = useState<LiveFeedResponse["summary"] | null>(null);
+  const [liveLoading, setLiveLoading] = useState(true);
   const sinceRef = useRef<string | undefined>(undefined);
 
   const tick = useCallback(async () => {
     try {
       const data = await getLiveFeed(sinceRef.current, 120);
       setError(null);
+      setLiveLoading(false);
       sinceRef.current = data.next_since;
       setSimTime(data.sim_time);
       setLegend(data.legend);
@@ -83,6 +85,7 @@ export default function Dashboard() {
     } catch (e) {
       setError(String(e));
       setPlaying(false);
+      setLiveLoading(false);
     }
   }, []);
 
@@ -203,6 +206,15 @@ export default function Dashboard() {
             onSelect={(i) => { setSelected(i); setActiveRoute(0); }}
             onRouteSelect={setActiveRoute}
           />
+
+          {/* live feed loading overlay */}
+          {mode === "live" && liveLoading && !error && (
+            <div className="absolute inset-0 z-[1100] flex flex-col items-center justify-center gap-4 bg-ink-900/70 backdrop-blur-sm">
+              <div className="h-10 w-10 animate-spin rounded-full border-2 border-white/15 border-t-accent" />
+              <div className="text-sm font-medium text-white/80">Loading live feed…</div>
+              <div className="text-xs text-white/40">Connecting to the traffic stream</div>
+            </div>
+          )}
 
           {/* floating controls over the map */}
           {mode === "live" && simTime && (
