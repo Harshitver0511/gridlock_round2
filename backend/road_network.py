@@ -145,7 +145,20 @@ def segments_near(lat: float, lng: float, radius_m: float = 350, limit: int = 80
         return []
     out = []
     seen = set()
-    for u, v, data in G.edges(data=True):
+
+    # Fast bounding box pre-filter to avoid O(E) haversine calculations
+    margin = max(0.015, (radius_m / 111000.0) * 1.5)
+    local_nodes = {
+        n for n, d in G.nodes(data=True)
+        if abs(d.get("y", 0) - lat) < margin and abs(d.get("x", 0) - lng) < margin
+    }
+    
+    if not local_nodes:
+        return []
+
+    local_G = G.subgraph(local_nodes)
+
+    for u, v, data in local_G.edges(data=True):
         key = (min(u, v), max(u, v))
         if key in seen:
             continue

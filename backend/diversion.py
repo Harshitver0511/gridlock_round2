@@ -76,10 +76,23 @@ def compute_diversion(lat, lng, risk, closure_prob,
     # default src/dst = points ~400m before/after the incident along lat axis
     src = src or {"lat": lat - 0.004, "lng": lng - 0.004}
     dst = dst or {"lat": lat + 0.004, "lng": lng + 0.004}
-    s = nearest_node(G, src["lat"], src["lng"])
-    t = nearest_node(G, dst["lat"], dst["lng"])
 
-    Gr = _to_simple_digraph(_penalize(G, lat, lng, risk, closure_prob))
+    # Extract a local subgraph (e.g. ~1.5 km radius) to avoid O(N) memory copies
+    # and to vastly speed up Dijkstra / Yen's K algorithm.
+    margin = 0.015
+    local_nodes = [
+        n for n, d in G.nodes(data=True)
+        if abs(d.get("y", 0) - lat) < margin and abs(d.get("x", 0) - lng) < margin
+    ]
+    if not local_nodes:
+        return _fallback(lat, lng, blocked_label, k)
+
+    local_G = G.subgraph(local_nodes).copy()
+
+    s = nearest_node(local_G, src["lat"], src["lng"])
+    t = nearest_node(local_G, dst["lat"], dst["lng"])
+
+    Gr = _to_simple_digraph(_penalize(local_G, lat, lng, risk, closure_prob))
 
     routes = []
     try:

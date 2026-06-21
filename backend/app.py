@@ -15,6 +15,9 @@ from predictor import enrich_incident, baseline_risk, congestion_segments
 from diversion import compute_diversion
 from quarantine import build_quarantine
 import api_keys
+from dispatch import generate_dispatch_plan
+from fleet_quarantine import generate_quarantine
+from green_wave import compute_green_wave
 
 app = FastAPI(title="Gridlock — Event-Driven Congestion API")
 app.add_middleware(
@@ -43,6 +46,18 @@ def live_feed(since: str | None = None, window: int = 120):
     highs = sum(1 for i in incidents if i["predicted_priority"] == "High")
     avg_clear = int(sum(i["predicted_clearance_min"] for i in incidents) / len(incidents)) if incidents else 0
 
+    # Fleet quarantine aggregate stats
+    fleets_notified = sum(
+        1 for i in incidents
+        if i.get("fleet_quarantine") is not None
+    ) * len(["Flipkart", "Swiggy", "Zepto", "Amazon", "Rapido"])
+    vol_reductions = [
+        i["fleet_quarantine"]["estimated_impact"]["volume_reduction_pct"]
+        for i in incidents
+        if i.get("fleet_quarantine")
+    ]
+    avg_vol_reduction = round(sum(vol_reductions) / len(vol_reductions), 1) if vol_reductions else 0
+
     return {
         "endpoint": "/api/live-feed",
         "sim_time": since_ts.isoformat(),
@@ -52,6 +67,8 @@ def live_feed(since: str | None = None, window: int = 120):
             "active_incidents": len(incidents),
             "high_priority": highs,
             "avg_clearance_min": avg_clear,
+            "fleets_notified": fleets_notified,
+            "volume_reduction_pct": avg_vol_reduction,
             "headline": f"{len(incidents)} new unplanned incident(s); {highs} high priority.",
         },
         "new_incidents": incidents,
@@ -144,6 +161,10 @@ def risk_map(datetime: str | None = None):
 
     overall_now = int(sum(z["risk_score"] for z in baseline_zones) / len(baseline_zones)) if baseline_zones else 0
     top = max(baseline_zones, key=lambda z: z["risk_score"], default=None)
+
+    # Pre-positioning dispatch plan for this hour
+    dispatch = generate_dispatch_plan(req)
+
     return {
         "endpoint": "/api/risk-map",
         "requested_datetime": req.isoformat(),
@@ -155,6 +176,7 @@ def risk_map(datetime: str | None = None):
         },
         "baseline_zones": baseline_zones,
         "risk_timeline": timeline,
+        "dispatch": dispatch,
         "legend": LEGEND,
     }
 
@@ -231,6 +253,24 @@ def forecast(req: dict):
             ) if is_core else None,
         })
 
+    # Fleet quarantine for the venue core zone
+    fleet_q = generate_quarantine(
+        lat, lng, peak, closure,
+        cause=cause, corridor=f"Venue: {cause}",
+    )
+
+    # Green wave for the primary venue diversion route
+    green_w = None
+    core_div = next(
+        (r["diversion"] for r in recommendations if r.get("diversion")),
+        None,
+    )
+    if core_div and core_div.get("routes"):
+        green_w = compute_green_wave(
+            core_div["routes"][0], peak, closure,
+            corridor=f"{cause} venue corridor",
+        )
+
     return {
         "endpoint": "/api/forecast",
         "request_echo": req,
@@ -244,5 +284,7 @@ def forecast(req: dict):
         "congestion_segments": congestion,
         "timeline": timeline,
         "recommendations": recommendations,
+        "fleet_quarantine": fleet_q,
+        "green_wave": green_w,
         "legend": LEGEND,
     }
